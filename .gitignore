@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Secrets & credentials — JANGAN PERNAH di-commit
+.env
+session.txt
+
+# Runtime / data lokal
+users.json
+*.log
+
+# Editor / OS
+.claude/
+.DS_Store
