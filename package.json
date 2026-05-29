@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Telegram/Fragment username availability checker via Robynhood API",
   "main": "index.js",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "bot": "node bot.js",
     "start": "node bot.js",
