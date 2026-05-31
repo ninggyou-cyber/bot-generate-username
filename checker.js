@@ -14,7 +14,7 @@ const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function runCheck({
   variations, delayMs = 500,
   onProgress, onBuyable, onUnclaimed, onTelegramTaken, onUncertain,
-  onPhase2Start, onPhase2Progress, onPhase2Retry,
+  onPhase2Start, onPhase2Progress, onPhase2Retry, onPhase2Wait,
   signal,
 }) {
   const buyable  = [];
@@ -69,7 +69,7 @@ async function runCheck({
     for (const u of toVerify) {
       if (signal?.aborted) break;
       try {
-        classify(u, await resolveUsername(u));
+        classify(u, await resolveUsername(u, { onWait: onPhase2Wait }));
       } catch (_) {
         uncertain.push(u);
         onUncertain?.(u);
@@ -88,7 +88,7 @@ async function runCheck({
       for (const u of retryList) {
         if (signal?.aborted) { uncertain.push(u); continue; }
         try {
-          classify(u, await resolveUsername(u, 6));
+          classify(u, await resolveUsername(u, { onWait: onPhase2Wait }));
         } catch (_) {
           uncertain.push(u); // tetap gagal → benar-benar uncertain
         }

@@ -2,6 +2,7 @@ require('dotenv').config();
 const { Telegraf, Markup } = require('telegraf');
 const { generateInsertOnly, generateReplaceOnly } = require('./generator');
 const { runCheck } = require('./checker');
+const { accountCount } = require('./tg-client');
 const users = require('./users');
 
 const BOT_TOKEN    = process.env.BOT_TOKEN;
@@ -293,6 +294,18 @@ async function startCheck(ctx, input, genFn, modeLabel) {
       onPhase2Start:   (n) => { fase2Total = n; editGramJSProgress(0); },
       onPhase2Progress: async (checked) => { await editGramJSProgress(checked); },
       onPhase2Retry:   (n) => { fase2Retry = true; fase2Total = n; uncertainList.length = 0; editGramJSProgress(0); },
+      onPhase2Wait: async (sec) => {
+        try {
+          await bot.telegram.editMessageText(
+            chatId, msgId, undefined,
+            `🔍 <b>@${input}</b>  ·  ${modeLabel}\n\n` +
+            `Fase 2 — Verifikasi via Telegram\n` +
+            `⏳ Semua akun lagi kena limit Telegram.\n` +
+            `Nunggu ~${sec}s, lanjut otomatis… (nggak perlu rerun)`,
+            { parse_mode: 'HTML' }
+          );
+        } catch (_) {}
+      },
       onProgress: async (checked, _t, _u, _r, flag) => {
         const now = Date.now();
         if (flag === 'ratelimit') {
@@ -477,8 +490,9 @@ process.on('uncaughtException', (err) => {
 (function launch(attempt = 1) {
   bot.launch();
   console.log(`[✓] Bot berjalan`);
-  console.log(`[✓] Owner ID : ${OWNER_ID}`);
-  console.log(`[✓] Delay    : ${DELAY_MS}ms per variasi`);
+  console.log(`[✓] Owner ID         : ${OWNER_ID}`);
+  console.log(`[✓] Delay Fragment   : ${DELAY_MS}ms per variasi`);
+  console.log(`[✓] Akun verifikasi  : ${accountCount()}`);
 })();
 
 process.once('SIGINT',  () => bot.stop('SIGINT'));

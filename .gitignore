@@ -3,7 +3,10 @@ node_modules/
 
 # Secrets & credentials — JANGAN PERNAH di-commit
 .env
+.env.railway
 session.txt
+sessions.env
+envcheck.txt
 
 # Runtime / data lokal
 users.json
